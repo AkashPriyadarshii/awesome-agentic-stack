@@ -1,0 +1,24 @@
+{
+  "name": "awesome-agentic-stack",
+  "version": "1.0.0",
+  "description": "Cross-platform installer for the curated ₹0 awesome-agentic-stack developer workspace.",
+  "main": "cli.js",
+  "bin": {
+    "awesome-agentic-stack": "./cli.js"
+  },
+  "keywords": [
+    "awesome-list",
+    "agentic-coding",
+    "vibe-coding",
+    "claude-code",
+    "opencode",
+    "antigravity",
+    "developer-stack"
+  ],
+  "author": "Akash Priyadarshi",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AkashPriyadarshii/awesome-agentic-stack.git"
+  }
+}

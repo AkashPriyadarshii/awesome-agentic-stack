@@ -25,6 +25,45 @@ The only agentic coding stack built for ₹0 budget and 50× output.
 
 ---
 
+## ⚡ Unified Installation
+
+Install all CLI tools, clone all agent skills, and deploy configuration templates in one command.
+
+### 🤖 For LLM Agents (Claude Code, OpenCode, Antigravity, etc.)
+Just paste this into your active coding agent:
+```text
+Read the install.sh (macOS/Linux) or install.ps1 (Windows) files in this repository and install all curation components for my system.
+```
+
+### 💻 For Terminals (Human Devs)
+
+Choose **one** command for your platform:
+
+**🎯 Universal (Requires Node.js):**
+```bash
+npx awesome-agentic-stack
+```
+
+**🍏 macOS / 🐧 Linux (Bash):**
+```bash
+curl -fsSL https://raw.githubusercontent.com/AkashPriyadarshii/awesome-agentic-stack/main/install.sh | bash
+```
+
+**🪟 Windows 11 (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/AkashPriyadarshii/awesome-agentic-stack/main/install.ps1 | iex
+```
+
+### ⚙️ Command Flags
+Customize your compilation:
+- `--essential` / `-e` : Install core elements only (~30 items)
+- `--interactive` / `-i` : Confirm each component before installing
+- `--yes` / `-y` : Auto-confirm all prompts (silent setup)
+- `--list` / `-l` : View all packages without installing
+- `--dry-run` / `-d` : Show actions without running commands
+
+---
+
 ## 🔄 The Dev Loop
 
 The 4-phase loop optimized for maximum token efficiency and ₹0 cost coding:

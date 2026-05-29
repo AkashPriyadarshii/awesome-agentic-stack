@@ -1,0 +1,433 @@
+{
+  "cli_binaries": [
+    {
+      "name": "ripgrep",
+      "binary": "rg",
+      "essential": true,
+      "brew": "ripgrep",
+      "apt": "ripgrep",
+      "winget": "BurntSushi.ripgrep",
+      "description": "Ultra-fast text search in files"
+    },
+    {
+      "name": "gitleaks",
+      "binary": "gitleaks",
+      "essential": true,
+      "brew": "gitleaks",
+      "apt": "curl",
+      "winget": "Git.GitLeaks",
+      "description": "Scans directory for credentials/secrets before push"
+    },
+    {
+      "name": "trufflehog",
+      "binary": "trufflehog",
+      "essential": false,
+      "brew": "trufflehog",
+      "apt": "curl",
+      "winget": "trufflesecurity.trufflehog",
+      "description": "Scans entire git history for leaked credentials"
+    },
+    {
+      "name": "tmux",
+      "binary": "tmux",
+      "essential": true,
+      "brew": "tmux",
+      "apt": "tmux",
+      "winget": "skip",
+      "description": "Terminal multiplexer for parallel agent splits"
+    },
+    {
+      "name": "jscpd",
+      "binary": "jscpd",
+      "essential": false,
+      "npm": "jscpd",
+      "description": "Detects duplicate/slop code in codebase"
+    },
+    {
+      "name": "repomix",
+      "binary": "repomix",
+      "essential": true,
+      "npm": "repomix",
+      "description": "Packs entire codebase into a single AI-optimized file"
+    },
+    {
+      "name": "openskills",
+      "binary": "openskills",
+      "essential": true,
+      "npm": "openskills",
+      "description": "Universal agent skill installer"
+    },
+    {
+      "name": "syncthing",
+      "binary": "syncthing",
+      "essential": false,
+      "brew": "syncthing",
+      "apt": "syncthing",
+      "winget": "Syncthing.Syncthing",
+      "description": "Continuous P2P cross-device file sync"
+    },
+    {
+      "name": "localsend",
+      "binary": "localsend",
+      "essential": false,
+      "brew": "localsend",
+      "apt": "snap",
+      "winget": "Localsend.Localsend",
+      "description": "FOSS AirDrop alternative for quick asset transfers"
+    },
+    {
+      "name": "vulture",
+      "binary": "vulture",
+      "essential": false,
+      "pip": "vulture",
+      "description": "Static analyzer to detect/delete dead Python code"
+    },
+    {
+      "name": "sniffnet",
+      "binary": "sniffnet",
+      "essential": false,
+      "brew": "sniffnet",
+      "apt": "cargo",
+      "winget": "GyulyVGC.Sniffnet",
+      "description": "Real-time network telemetry for debugging agent APIs"
+    },
+    {
+      "name": "headroom",
+      "binary": "headroom",
+      "essential": false,
+      "npm": "headroom",
+      "description": "Compress dense raw logs/traces before model ingestion"
+    }
+  ],
+  "skills": [
+    {
+      "repo": "obra/superpowers",
+      "name": "superpowers",
+      "essential": true,
+      "description": "Skill backbone & methodology for agent capability"
+    },
+    {
+      "repo": "affaan-m/ECC",
+      "name": "ecc",
+      "essential": true,
+      "description": "Harness optimizer for coding agents"
+    },
+    {
+      "repo": "multica-ai/andrej-karpathy-skills",
+      "name": "andrej-karpathy-skills",
+      "essential": true,
+      "description": "CLAUDE.md rules from Karpathy"
+    },
+    {
+      "repo": "mattpocock/skills",
+      "name": "mattpocock-skills",
+      "essential": false,
+      "description": "Real engineer skills extracted from matt's .claude dir"
+    },
+    {
+      "repo": "msitarzewski/agency-agents",
+      "name": "agency-agents",
+      "essential": false,
+      "description": "AI agency with specialized roles (frontend, PM, QA)"
+    },
+    {
+      "repo": "garrytan/gstack",
+      "name": "gstack",
+      "essential": false,
+      "description": "Garry Tan's exact setup roles"
+    },
+    {
+      "repo": "ComposioHQ/awesome-claude-skills",
+      "name": "awesome-claude-skills",
+      "essential": false,
+      "description": "Claude-specific capability extensions"
+    },
+    {
+      "repo": "addyosmani/agent-skills",
+      "name": "agent-skills",
+      "essential": false,
+      "description": "Production-grade engineering skills"
+    },
+    {
+      "repo": "Leonxlnx/taste-skill",
+      "name": "taste-skill",
+      "essential": true,
+      "description": "Enforces strict visual/logical taste"
+    },
+    {
+      "repo": "blader/humanizer",
+      "name": "humanizer",
+      "essential": true,
+      "description": "Strips standard AI writing patterns & therapeutic filler"
+    },
+    {
+      "repo": "hardikpandya/stop-slop",
+      "name": "stop-slop",
+      "essential": false,
+      "description": "Rule-based anti-slop filters for documentation"
+    },
+    {
+      "repo": "dominikmartn/nothing-design-skill",
+      "name": "nothing-design-skill",
+      "essential": false,
+      "description": "Nothing Phone monochrome visual rules"
+    },
+    {
+      "repo": "Chachamaru127/claude-code-harness",
+      "name": "claude-code-harness",
+      "essential": false,
+      "description": "Complete Plan -> Work -> Review harness"
+    },
+    {
+      "repo": "lifedever/claude-rules",
+      "name": "claude-rules",
+      "essential": false,
+      "description": "Auto-detects tech stack and writes project rules"
+    },
+    {
+      "repo": "dtnewman/burn-baby-burn",
+      "name": "burn-baby-burn",
+      "essential": false,
+      "description": "Continuous auto-running agent loop"
+    },
+    {
+      "repo": "revfactory/harness",
+      "name": "harness",
+      "essential": false,
+      "description": "Meta-skill to architect custom AI councils"
+    },
+    {
+      "repo": "Lap-Platform/LAP",
+      "name": "lap",
+      "essential": false,
+      "description": "Compiles OpenAPI specs to agent skills"
+    },
+    {
+      "repo": "aiwithremy/claude-skills-llm-council",
+      "name": "llm-council",
+      "essential": false,
+      "description": "LLM council for parallel advisor scoring"
+    },
+    {
+      "repo": "apify/agent-skills",
+      "name": "apify-skills",
+      "essential": false,
+      "description": "Web scraping, crawling & research skills"
+    },
+    {
+      "repo": "browserbase/skills",
+      "name": "browserbase-skills",
+      "essential": false,
+      "description": "Headless browser parsing skills"
+    },
+    {
+      "repo": "farion1231/cc-switch",
+      "name": "cc-switch",
+      "essential": false,
+      "description": "Workspace desktop switcher for agents"
+    },
+    {
+      "repo": "hesamsheikh/octogent",
+      "name": "octogent",
+      "essential": false,
+      "description": "Orchestration dashboard & context logger"
+    },
+    {
+      "repo": "generalaction/emdash",
+      "name": "emdash",
+      "essential": false,
+      "description": "Instantly run multiple agents in parallel"
+    },
+    {
+      "repo": "horang-labs/tessera",
+      "name": "tessera",
+      "essential": false,
+      "description": "Visual workspace and git worktrees TUI"
+    },
+    {
+      "repo": "jazzenchen/VibeAround",
+      "name": "vibearound",
+      "essential": false,
+      "description": "Runs agent CLI loops side-by-side in real-time sync"
+    },
+    {
+      "repo": "manaflow-ai/cmux",
+      "name": "cmux",
+      "essential": false,
+      "description": "Ghostty terminal session manager"
+    },
+    {
+      "repo": "snarktank/ralph",
+      "name": "ralph",
+      "essential": false,
+      "description": "Loop-until-done CLI that self-corrects"
+    },
+    {
+      "repo": "Yeachan-Heo/oh-my-claudecode",
+      "name": "oh-my-claudecode",
+      "essential": false,
+      "description": "Multi-agent team manager"
+    },
+    {
+      "repo": "multica-ai/multica",
+      "name": "multica",
+      "essential": false,
+      "description": "Managed agents console"
+    },
+    {
+      "repo": "nicedreamzapp/claude-code-local",
+      "name": "claude-code-local",
+      "essential": false,
+      "description": "Runs agent loop 100% locally on Apple Silicon"
+    },
+    {
+      "repo": "slopus/happy",
+      "name": "happy",
+      "essential": false,
+      "description": "AMOLED mobile web client with voice pipeline"
+    },
+    {
+      "repo": "getpaseo/paseo",
+      "name": "paseo",
+      "essential": false,
+      "description": "Run agent loops directly from your phone"
+    },
+    {
+      "repo": "unitedbyai/droidclaw",
+      "name": "droidclaw",
+      "essential": false,
+      "description": "ADB-based mobile agent tap controller"
+    },
+    {
+      "repo": "denoland/clawpatrol",
+      "name": "clawpatrol",
+      "essential": false,
+      "description": "Security sandbox firewall for CLI agents"
+    },
+    {
+      "repo": "elementalsouls/Claude-BugHunter",
+      "name": "claude-bughunter",
+      "essential": false,
+      "description": "Claude Code security audit skill (51 rules)"
+    },
+    {
+      "repo": "mukul975/Anthropic-Cybersecurity-Skills",
+      "name": "anthropic-cybersecurity-skills",
+      "essential": false,
+      "description": "750+ security auditing & vulnerability scanning skills"
+    },
+    {
+      "repo": "0sec-labs/foxguard",
+      "name": "foxguard",
+      "essential": false,
+      "description": "Diff-aware secrets filter TUI"
+    },
+    {
+      "repo": "zhangfengcdt/memoir",
+      "name": "memoir",
+      "essential": false,
+      "description": "Tracks and snapshots agent memory states"
+    },
+    {
+      "repo": "raine/git-surgeon",
+      "name": "git-surgeon",
+      "essential": false,
+      "description": "Git manipulation primitives for agents"
+    },
+    {
+      "repo": "git-ai-project/git-ai",
+      "name": "git-ai",
+      "essential": false,
+      "description": "Auto-documents and tags agent-generated edits"
+    },
+    {
+      "repo": "ReviewStage/stage-cli",
+      "name": "stage-cli",
+      "essential": false,
+      "description": "Breaks agent PRs into small chapters"
+    }
+  ],
+  "templates": [
+    "AGENTS.md",
+    "SPEC.md",
+    "DESIGN.md",
+    "CLAUDE.md"
+  ],
+  "references": [
+    {
+      "name": "public-apis",
+      "url": "https://github.com/public-apis/public-apis",
+      "description": "Massive registry of completely free APIs"
+    },
+    {
+      "name": "awesome-free-llm-apis",
+      "url": "https://github.com/mnfst/awesome-free-llm-apis",
+      "description": "Curated list of free credit-card-free LLM endpoints"
+    },
+    {
+      "name": "prompts.chat",
+      "url": "https://github.com/f/prompts.chat",
+      "description": "Persona prompts for model framing"
+    },
+    {
+      "name": "Prompt-Engineering-Guide",
+      "url": "https://github.com/dair-ai/Prompt-Engineering-Guide",
+      "description": "Advanced prompting methodologies: CoT, ReAct"
+    },
+    {
+      "name": "claude-code-best-practice",
+      "url": "https://github.com/shanraisshan/claude-code-best-practice",
+      "description": "Best operational guidelines for Claude Code"
+    },
+    {
+      "name": "awesome-openclaw-usecases",
+      "url": "https://github.com/hesamsheikh/awesome-openclaw-usecases",
+      "description": "Real-world OpenClaw integration examples"
+    },
+    {
+      "name": "awesome-opencode",
+      "url": "https://github.com/awesome-opencode/awesome-opencode",
+      "description": "Plugins, themes, and extensions for OpenCode"
+    },
+    {
+      "name": "claude-howto",
+      "url": "https://github.com/luongnv89/claude-howto",
+      "description": "Detailed templates and instructions for Claude Code"
+    },
+    {
+      "name": "system_prompts_leaks",
+      "url": "https://github.com/asgeirtj/system_prompts_leaks",
+      "description": "System prompts leaked from major models"
+    },
+    {
+      "name": "Dive-into-Claude-Code",
+      "url": "https://github.com/VILA-Lab/Dive-into-Claude-Code",
+      "description": "Under-the-hood code protocol of Claude Code"
+    },
+    {
+      "name": "dictionary-of-ai-coding",
+      "url": "https://github.com/mattpocock/dictionary-of-ai-coding",
+      "description": "AI coding definitions"
+    },
+    {
+      "name": "awesome-llm-apps",
+      "url": "https://github.com/Shubhamsaboo/awesome-llm-apps",
+      "description": "Production RAG, agent and vision loops"
+    },
+    {
+      "name": "system-design-primer",
+      "url": "https://github.com/donnemartin/system-design-primer",
+      "description": "System design framework standard"
+    },
+    {
+      "name": "learn-claude-code",
+      "url": "https://github.com/shareAI-lab/learn-claude-code",
+      "description": "Tutorials to build custom terminal agent loops"
+    },
+    {
+      "name": "unofficial-apis",
+      "url": "https://github.com/Rolstenhouse/unofficial-apis",
+      "description": "Catalog of unofficial web APIs"
+    }
+  ]
+}
