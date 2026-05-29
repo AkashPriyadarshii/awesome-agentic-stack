@@ -1,5 +1,5 @@
 # ==============================================================================
-# awesome-agentic-stack — Robust Windows 11 PowerShell Installer
+# awesome-agentic-stack -- Robust Windows 11 PowerShell Installer
 # Curated by Akash Priyadarshi (Mac M5 + GT7 Windows Curation Stack)
 # ==============================================================================
 
@@ -16,12 +16,15 @@ $ErrorActionPreference = "SilentlyContinue"
 
 # Text Colors helper
 function Write-Color {
-    param([string]$Text, [string]$Color)
+    param(
+        [string]$Text,
+        [string]$Color
+    )
     Write-Host $Text -ForegroundColor $Color
 }
 
 Write-Color "======================================================================" "Cyan"
-Write-Color "⚡ awesome-agentic-stack — Robust Windows 11 Installer ⚡" "White"
+Write-Color "[stack] awesome-agentic-stack - Robust Windows 11 Installer" "White"
 Write-Color "======================================================================" "Cyan"
 Write-Host ""
 
@@ -41,26 +44,17 @@ $SkipList = @()
 # ------------------------------------------------------------------------------
 # Robust Helper Utilities
 # ------------------------------------------------------------------------------
-function Check-Command ($cmd) {
+function Check-Command {
+    param(
+        [string]$cmd
+    )
     return [bool](Get-Command $cmd -ErrorAction SilentlyContinue)
 }
 
-function Retry-Cmd {
-    param([scriptblock]$sb)
-    $count = 0
-    $max = 3
-    $delay = 2
-    until (& $sb) {
-        if ($count -eq $max) { return $false }
-        $count++
-        Write-Color "  [!] Command failed. Retrying in $($delay)s... ($count/$max)" "Yellow"
-        Start-Sleep -Seconds $delay
-        $delay = $delay * 2
-    }
-    return $true
-}
-
-function Ask-Confirm ($name) {
+function Ask-Confirm {
+    param(
+        [string]$name
+    )
     if ($Yes) { return $true }
     $choice = Read-Host "  [?] Proceed with $name? (y/n)"
     return ($choice -eq "y" -or $choice -eq "Y")
@@ -72,13 +66,25 @@ function Ask-Confirm ($name) {
 Write-Color "[1/5] Running Pre-Flight checks..." "White"
 
 # Load local manifest or fetch it
-$ManifestPath = "$PSScriptRoot\scripts\manifest.json"
+$ManifestPath = $PSScriptRoot + "\scripts\manifest.json"
 if (-not (Test-Path $ManifestPath)) {
     if (-not (Test-Path $TempDir)) { New-Item -ItemType Directory -Path $TempDir -Force | Out-Null }
-    $ManifestPath = "$TempDir\manifest.json"
+    $ManifestPath = $TempDir + "\manifest.json"
     Write-Color "  [+] Fetching repository manifest.json..." "Yellow"
     $ManifestUrl = "https://raw.githubusercontent.com/AkashPriyadarshii/awesome-agentic-stack/main/scripts/manifest.json"
-    $fetched = Retry-Cmd { Invoke-WebRequest -Uri $ManifestUrl -OutFile $ManifestPath -TimeoutSec 10 }
+    
+    # Inline retry for manifest download
+    $fetched = $false
+    for ($i = 1; $i -le 3; $i++) {
+        Invoke-WebRequest -Uri $ManifestUrl -OutFile $ManifestPath -TimeoutSec 10
+        if ($?) {
+            $fetched = $true
+            break
+        }
+        Write-Color "  [!] Download failed. Retrying... ($i/3)" "Yellow"
+        Start-Sleep -Seconds 2
+    }
+
     if (-not $fetched) {
         Write-Color "  [-] Network error: Failed to fetch manifest.json. Verify network." "Red"
         exit 1
@@ -90,8 +96,30 @@ if (-not (Test-Path $ManifestPath)) {
 # Parse manifest json safely
 $Manifest = Get-Content -Raw -Path $ManifestPath | ConvertFrom-Json
 
+# If -List is requested, print the manifest and exit
+if ($List) {
+    Write-Color "=== CURATED TOOL LIST (96 repos) ===" "White"
+    Write-Host ""
+    Write-Color "[CLI Binaries]" "Yellow"
+    foreach ($cli in $Manifest.cli_binaries) {
+        Write-Host ("  - " + $cli.name + " (bin: " + $cli.binary + ")")
+    }
+    Write-Host ""
+    Write-Color "[Agent Skill Repos]" "Yellow"
+    foreach ($skill in $Manifest.skills) {
+        Write-Host ("  - " + $skill.name + " (repo: " + $skill.repo + ")")
+    }
+    Write-Host ""
+    Write-Color "[Always-Open Reference Blueprints]" "Yellow"
+    foreach ($ref in $Manifest.references) {
+        Write-Host ("  - " + $ref.name + ": " + $ref.url)
+    }
+    Write-Host ""
+    exit 0
+}
+
 # Package Manager check
-$WingetAvailable = Check-Command "winget"
+$WingetAvailable = Check-Command -cmd "winget"
 if ($WingetAvailable) {
     Write-Color "  [+] winget package manager detected." "Green"
 } else {
@@ -101,12 +129,12 @@ if ($WingetAvailable) {
 # Verify Core Deps
 $Deps = @("git", "node", "npm")
 foreach ($dep in $Deps) {
-    if (Check-Command $dep) {
-        Write-Color "  [+] Dependency $dep: Installed" "Green"
+    if (Check-Command -cmd $dep) {
+        Write-Color ("  [+] Dependency " + $dep + ": Installed") "Green"
     } else {
-        Write-Color "  [-] Dependency $dep: Missing" "Red"
+        Write-Color ("  [-] Dependency " + $dep + ": Missing") "Red"
         if ($WingetAvailable) {
-            Write-Color "  [+] Auto-installing $dep via winget..." "Yellow"
+            Write-Color ("  [+] Auto-installing " + $dep + " via winget...") "Yellow"
             if ($dep -eq "git") {
                 winget install --id Git.Git --silent --accept-source-agreements --accept-package-agreements | Out-Null
             } elseif ($dep -eq "node") {
@@ -138,14 +166,22 @@ foreach ($path in $SkillPaths) {
 Write-Host ""
 Write-Color "[3/5] Starting curation compilation..." "White"
 
-function Install-CLI ($name, $binary, $winget_pkg, $npm_pkg, $pip_pkg) {
+function Install-CLI {
+    param(
+        [string]$name,
+        [string]$binary,
+        [string]$winget_pkg,
+        [string]$npm_pkg,
+        [string]$pip_pkg
+    )
+
     if ($DryRun) {
         Write-Color "  [dry-run] Installing CLI: $name" "Gray"
         return $true
     }
 
     # Check if already installed
-    if (Check-Command $binary) {
+    if (Check-Command -cmd $binary) {
         Write-Color "  [+] $name is already installed." "Gray"
         $global:SuccessList += $name
         return $true
@@ -154,7 +190,16 @@ function Install-CLI ($name, $binary, $winget_pkg, $npm_pkg, $pip_pkg) {
     # NPM installation
     if ($npm_pkg -and $npm_pkg -ne "null") {
         Write-Color "  [+] Installing global NPM package: $name" "Yellow"
-        $npmResult = Retry-Cmd { npm install -g $npm_pkg --silent }
+        $npmResult = $false
+        for ($i = 1; $i -le 3; $i++) {
+            npm install -g $npm_pkg --silent
+            if ($?) {
+                $npmResult = $true
+                break
+            }
+            Write-Color "  [!] npm install failed. Retrying... ($i/3)" "Yellow"
+            Start-Sleep -Seconds 2
+        }
         if ($npmResult) {
             $global:SuccessList += $name
             return $true
@@ -164,7 +209,16 @@ function Install-CLI ($name, $binary, $winget_pkg, $npm_pkg, $pip_pkg) {
     # Winget installation
     if ($WingetAvailable -and $winget_pkg -and $winget_pkg -ne "null" -and $winget_pkg -ne "skip") {
         Write-Color "  [+] Installing via winget: $name" "Yellow"
-        $wingetResult = Retry-Cmd { winget install --id $winget_pkg --silent --accept-source-agreements --accept-package-agreements }
+        $wingetResult = $false
+        for ($i = 1; $i -le 3; $i++) {
+            winget install --id $winget_pkg --silent --accept-source-agreements --accept-package-agreements
+            if ($?) {
+                $wingetResult = $true
+                break
+            }
+            Write-Color "  [!] winget install failed. Retrying... ($i/3)" "Yellow"
+            Start-Sleep -Seconds 2
+        }
         if ($wingetResult) {
             $global:SuccessList += $name
             return $true
@@ -172,9 +226,18 @@ function Install-CLI ($name, $binary, $winget_pkg, $npm_pkg, $pip_pkg) {
     }
 
     # Pip installation
-    if ($pip_pkg -and $pip_pkg -ne "null" -and (Check-Command "pip")) {
+    if ($pip_pkg -and $pip_pkg -ne "null" -and (Check-Command -cmd "pip")) {
         Write-Color "  [+] Installing via pip: $name" "Yellow"
-        $pipResult = Retry-Cmd { pip install --user $pip_pkg }
+        $pipResult = $false
+        for ($i = 1; $i -le 3; $i++) {
+            pip install --user $pip_pkg
+            if ($?) {
+                $pipResult = $true
+                break
+            }
+            Write-Color "  [!] pip install failed. Retrying... ($i/3)" "Yellow"
+            Start-Sleep -Seconds 2
+        }
         if ($pipResult) {
             $global:SuccessList += $name
             return $true
@@ -185,14 +248,26 @@ function Install-CLI ($name, $binary, $winget_pkg, $npm_pkg, $pip_pkg) {
     if ($name -eq "gitleaks") {
         Write-Color "  [+] Attempting custom zip fetch for Gitleaks..." "Yellow"
         $dl_url = "https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks_windows_x64.zip"
-        $zip_dest = "$TempDir\gitleaks.zip"
-        $extract_dest = "$TempDir\gitleaks_extracted"
-        if (Retry-Cmd { Invoke-WebRequest -Uri $dl_url -OutFile $zip_dest -TimeoutSec 10 }) {
-            Expand-Archive -Path $zip_dest -DestinationPath $extract_dest -Force || Out-Null
-            if (Test-Path "$extract_dest\gitleaks.exe") {
-                $local_bin = "$env:USERPROFILE\.local\bin"
+        $zip_dest = $TempDir + "\gitleaks.zip"
+        $extract_dest = $TempDir + "\gitleaks_extracted"
+        
+        $dlResult = $false
+        for ($i = 1; $i -le 3; $i++) {
+            Invoke-WebRequest -Uri $dl_url -OutFile $zip_dest -TimeoutSec 10
+            if ($?) {
+                $dlResult = $true
+                break
+            }
+            Write-Color "  [!] Download failed. Retrying... ($i/3)" "Yellow"
+            Start-Sleep -Seconds 2
+        }
+
+        if ($dlResult) {
+            Expand-Archive -Path $zip_dest -DestinationPath $extract_dest -Force
+            if (Test-Path ($extract_dest + "\gitleaks.exe")) {
+                $local_bin = $env:USERPROFILE + "\.local\bin"
                 if (-not (Test-Path $local_bin)) { New-Item -ItemType Directory -Path $local_bin -Force | Out-Null }
-                Copy-Item -Path "$extract_dest\gitleaks.exe" -Destination "$local_bin\gitleaks.exe" -Force
+                Copy-Item -Path ($extract_dest + "\gitleaks.exe") -Destination ($local_bin + "\gitleaks.exe") -Force
                 $global:SuccessList += "gitleaks"
                 return $true
             }
@@ -212,7 +287,7 @@ foreach ($cli in $Manifest.cli_binaries) {
     }
 
     if ($Interactive) {
-        if (-not (Ask-Confirm "CLI component $($cli.name)")) {
+        if (-not (Ask-Confirm -name ("CLI component " + $cli.name))) {
             $SkipList += $cli.name
             continue
         }
@@ -227,40 +302,68 @@ foreach ($cli in $Manifest.cli_binaries) {
 Write-Host ""
 Write-Color "[4/5] Syncing agent skill blueprints..." "White"
 
-function Clone-Skill ($repo, $name) {
+function Clone-Skill {
+    param(
+        [string]$repo,
+        [string]$name
+    )
+
     if ($DryRun) {
-        Write-Color "  [dry-run] git clone https://github.com/$repo to skill paths" "Gray"
+        Write-Color ("  [dry-run] git clone https://github.com/" + $repo + " to skill paths") "Gray"
         return $true
     }
 
-    Write-Color "  [+] Syncing skill: $name..." "Yellow"
-    $dest_dir = "$TempDir\skills\$name"
+    Write-Color ("  [+] Syncing skill: " + $name + "...") "Yellow"
+    $dest_dir = $TempDir + "\skills\" + $name
     if (Test-Path $dest_dir) { Remove-Item -Recurse -Force -LiteralPath $dest_dir }
 
     # Clone via Git
-    $cloned = Retry-Cmd { git clone --depth 1 "https://github.com/$repo.git" $dest_dir --quiet }
+    $cloned = $false
+    $repo_url = "https://github.com/" + $repo + ".git"
+    for ($i = 1; $i -le 3; $i++) {
+        git clone --depth 1 $repo_url $dest_dir --quiet
+        if ($?) {
+            $cloned = $true
+            break
+        }
+        Write-Color "  [!] git clone failed. Retrying... ($i/3)" "Yellow"
+        Start-Sleep -Seconds 2
+    }
+
     if ($cloned -and (Test-Path $dest_dir)) {
         foreach ($path in $SkillPaths) {
             if (Test-Path $path) {
-                Copy-Item -Path "$dest_dir\*" -Destination $path -Recurse -Force -ErrorAction SilentlyContinue
+                Copy-Item -Path ($dest_dir + "\*") -Destination $path -Recurse -Force -ErrorAction SilentlyContinue
             }
         }
-        Write-Color "    ✓ Skill cloned & distributed successfully." "Green"
+        Write-Color "    [+] Skill cloned & distributed successfully." "Green"
         $global:SuccessList += $name
         return $true
     } else {
         # Fallback to direct Zip Download
         Write-Color "    [!] Git clone failed. Attempting zip fallback..." "Yellow"
-        $zip_url = "https://github.com/$repo/archive/refs/heads/main.zip"
-        $zip_path = "$TempDir\$name.zip"
-        $zip_extracted = "$TempDir\$name`_extracted"
-        if (Retry-Cmd { Invoke-WebRequest -Uri $zip_url -OutFile $zip_path -TimeoutSec 10 }) {
-            Expand-Archive -Path $zip_path -DestinationPath $zip_extracted -Force || Out-Null
+        $zip_url = "https://github.com/" + $repo + "/archive/refs/heads/main.zip"
+        $zip_path = $TempDir + "\" + $name + ".zip"
+        $zip_extracted = $TempDir + "\" + $name + "_extracted"
+        
+        $dlResult = $false
+        for ($i = 1; $i -le 3; $i++) {
+            Invoke-WebRequest -Uri $zip_url -OutFile $zip_path -TimeoutSec 10
+            if ($?) {
+                $dlResult = $true
+                break
+            }
+            Write-Color "  [!] Zip download failed. Retrying... ($i/3)" "Yellow"
+            Start-Sleep -Seconds 2
+        }
+
+        if ($dlResult) {
+            Expand-Archive -Path $zip_path -DestinationPath $zip_extracted -Force
             $subfolder = Get-ChildItem -Path $zip_extracted | Select-Object -First 1
             if ($subfolder) {
                 foreach ($path in $SkillPaths) {
                     if (Test-Path $path) {
-                        Copy-Item -Path "$($subfolder.FullName)\*" -Destination $path -Recurse -Force -ErrorAction SilentlyContinue
+                        Copy-Item -Path ($subfolder.FullName + "\*") -Destination $path -Recurse -Force -ErrorAction SilentlyContinue
                     }
                 }
                 $global:SuccessList += $name
@@ -269,7 +372,7 @@ function Clone-Skill ($repo, $name) {
         }
     }
 
-    Write-Color "    [-] Failed to sync skill: $name" "Red"
+    Write-Color ("    [-] Failed to sync skill: " + $name) "Red"
     $global:FailList += $name
     return $false
 }
@@ -282,7 +385,7 @@ foreach ($skill in $Manifest.skills) {
     }
 
     if ($Interactive) {
-        if (-not (Ask-Confirm "Skill clone $($skill.name)")) {
+        if (-not (Ask-Confirm -name ("Skill clone " + $skill.name))) {
             $SkipList += $skill.name
             continue
         }
@@ -296,16 +399,16 @@ foreach ($skill in $Manifest.skills) {
 # ------------------------------------------------------------------------------
 Write-Host ""
 Write-Color "[5/5] Deploying context template files..." "White"
-$TemplateDir = "$env:USERPROFILE\.config\awesome-agentic-stack\templates"
+$TemplateDir = $env:USERPROFILE + "\.config\awesome-agentic-stack\templates"
 if ($DryRun) {
-    Write-Color "  [dry-run] mkdir -p $TemplateDir" "Gray"
+    Write-Color ("  [dry-run] mkdir -p " + $TemplateDir) "Gray"
     Write-Color "  [dry-run] Deploy templates" "Gray"
 } else {
     if (-not (Test-Path $TemplateDir)) { New-Item -ItemType Directory -Path $TemplateDir -Force | Out-Null }
     foreach ($tmpl in $Manifest.templates) {
-        if (Test-Path "$PSScriptRoot\$tmpl") {
-            Copy-Item -Path "$PSScriptRoot\$tmpl" -Destination $TemplateDir -Force
-            Write-Color "  [+] Template deployed: $tmpl" "Green"
+        if (Test-Path ($PSScriptRoot + "\" + $tmpl)) {
+            Copy-Item -Path ($PSScriptRoot + "\" + $tmpl) -Destination $TemplateDir -Force
+            Write-Color ("  [+] Template deployed: " + $tmpl) "Green"
         }
     }
 }
@@ -315,7 +418,7 @@ if ($DryRun) {
 # ------------------------------------------------------------------------------
 Write-Host ""
 Write-Color "======================================================================" "Cyan"
-Write-Color "📋 COMPILATION COMPLETED — SYSTEM VERIFICATION REPORT" "White"
+Write-Color "[REPORT] COMPILATION COMPLETED - SYSTEM VERIFICATION REPORT" "White"
 Write-Color "======================================================================" "Cyan"
 Write-Host ""
 
@@ -328,7 +431,7 @@ Write-Host ""
 if ($FailList.Count -gt 0) {
     Write-Color "Failed Components (Requires Manual Review):" "Red"
     foreach ($fail in $FailList) {
-        Write-Color "  - $fail" "Red"
+        Write-Color ("  - " + $fail) "Red"
     }
     Write-Host ""
 }
@@ -338,15 +441,15 @@ Write-Color "Checking Path Integration..." "White"
 $PathSuccess = $true
 $CheckCLIs = @("repomix", "openskills", "rg", "gitleaks")
 foreach ($cli in $CheckCLIs) {
-    if (Check-Command $cli) {
-        Write-Color "  [yes] $cli : Functional" "Green"
+    if (Check-Command -cmd $cli) {
+        Write-Color ("  [yes] " + $cli + " : Functional") "Green"
     } else {
         if ($cli -eq "rg" -and (Test-Path "C:\Program Files\ripgrep")) {
              Write-Color "  [yes] ripgrep : Functional (requires PATH restart)" "Green"
-        } elseif ($cli -eq "gitleaks" -and (Test-Path "$env:USERPROFILE\AppData\Local\Microsoft\WinGet\Packages\Git.GitLeaks_Microsoft.Winget.Source_default")) {
+        } elseif ($cli -eq "gitleaks" -and (Test-Path ($env:USERPROFILE + "\AppData\Local\Microsoft\WinGet\Packages\Git.GitLeaks_Microsoft.Winget.Source_default"))) {
              Write-Color "  [yes] gitleaks : Functional (requires PATH restart)" "Green"
         } else {
-             Write-Color "  [no]  $cli : Missing or requires shell restart" "Red"
+             Write-Color ("  [no]  " + $cli + " : Missing or requires shell restart") "Red"
              $PathSuccess = $false
         }
     }
@@ -361,11 +464,11 @@ if (-not $PathSuccess) {
 
 # References to open
 Write-Host ""
-Write-Color "🌐 26 SURVIVAL REFERENCE BLUEPRINTS (Bookmark These!):" "White"
+Write-Color "[*] 26 SURVIVER BLUEPRINTS (Bookmark These!):" "White"
 foreach ($ref in $Manifest.references) {
-    Write-Color "  - $($ref.name): $($ref.url)" "Cyan"
+    Write-Color ("  - " + $ref.name + ": " + $ref.url) "Cyan"
 }
 
 Write-Host ""
-Write-Color "✓ Setup complete! Your workspace has been compiled." "Green"
+Write-Color "[+] Setup complete! Your workspace has been compiled." "Green"
 Write-Color "======================================================================" "Cyan"
