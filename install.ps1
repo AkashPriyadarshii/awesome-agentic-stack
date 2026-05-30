@@ -524,15 +524,12 @@ if ($FailList.Count -gt 0) {
         switch ($failName) {
             "ripgrep" {
                 Write-Color "  rg (ripgrep):" "White"
-                Write-Color "    Option A: Download from https://github.com/BurntSushi/ripgrep/releases" "Cyan"
-                Write-Color "    Option B: scoop install ripgrep" "Cyan"
-                Write-Color "    Option C: winget install ripgrep (try after winget source update)" "Cyan"
+                Write-Color "    Download from https://github.com/BurntSushi/ripgrep/releases" "Cyan"
             }
             "gitleaks" {
                 Write-Color "  gitleaks:" "White"
-                Write-Color "    Option A: go install github.com/gitleaks/gitleaks/v8@latest" "Cyan"
-                Write-Color "    Option B: Download from https://github.com/gitleaks/gitleaks/releases" "Cyan"
-                Write-Color "    Option C: scoop install gitleaks" "Cyan"
+                Write-Color "    go install github.com/gitleaks/gitleaks/v8@latest" "Cyan"
+                Write-Color "    Download from https://github.com/gitleaks/gitleaks/releases" "Cyan"
             }
             "trufflehog" {
                 Write-Color "  trufflehog:" "White"
