@@ -17,6 +17,7 @@
   ],
   "author": "Akash Priyadarshi",
   "license": "MIT",
+  "files": ["cli.js"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/AkashPriyadarshii/awesome-agentic-stack.git"

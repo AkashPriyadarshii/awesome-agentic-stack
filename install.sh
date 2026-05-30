@@ -166,11 +166,13 @@ echo -e "  [+] Selected Package Manager: ${CYAN}${PKG_MGR:-None}${NC}"
 
 # Check essential core deps
 DEPS=("git" "node" "npm")
+MISSING_DEPS=()
 for dep in "${DEPS[@]}"; do
   if check_command "$dep"; then
     echo -e "  [+] Dependency $dep: ${GREEN}Installed${NC}"
   else
     echo -e "  [-] Dependency $dep: ${RED}Missing${NC}"
+    MISSING_DEPS+=("$dep")
     if [ "$PKG_MGR" = "brew" ]; then
       echo "  [+] Attempting to auto-install $dep via Homebrew..."
       retry_cmd brew install "$dep" || true
@@ -180,6 +182,30 @@ for dep in "${DEPS[@]}"; do
     fi
   fi
 done
+
+# Check additional tooling
+HAS_PIP=$(check_command pip3 && echo true || echo false)
+HAS_GO=$(check_command go && echo true || echo false)
+HAS_CARGO=$(check_command cargo && echo true || echo false)
+HAS_CURL=$(check_command curl && echo true || echo false)
+
+# Bootstrap: show advice for missing core deps
+if [ ${#MISSING_DEPS[@]} -gt 0 ]; then
+  echo ""
+  echo -e "${YELLOW}[!] SYSTEM READINESS REPORT:${NC}"
+  echo -e "${YELLOW}  The following core dependencies are missing:${NC}"
+  for m in "${MISSING_DEPS[@]}"; do
+    case "$m" in
+      git)  echo -e "    git  → ${CYAN}https://git-scm.com/downloads${NC}" ;;
+      node) echo -e "    node → ${CYAN}https://nodejs.org${NC} (includes npm)" ;;
+      npm)  echo -e "    npm  → bundled with Node.js (see above)" ;;
+    esac
+  done
+  echo -e "${YELLOW}  Install missing deps, then re-run.${NC}"
+  echo ""
+fi
+
+echo -e "  [+] Available methods: brew/apt + npm + pip3 + $( $HAS_GO && echo 'go +' )$( $HAS_CARGO && echo 'cargo +' )direct-dl"
 
 # Setup directories
 echo -e "\n${BOLD}[2/5] Structuring global agent skill environments...${NC}"
@@ -208,10 +234,25 @@ install_cli() {
   local apt_pkg="$4"
   local npm_pkg="$5"
   local pip_pkg="$6"
+  local go_pkg="${7:-}"
+  local cargo_pkg="${8:-}"
+  local url_darwin="${9:-}"
+  local url_linux="${10:-}"
+  local platform_skip="${11:-}"
+  local attempted=""
 
   if [ "$DRY_RUN" = true ]; then
     echo "  [dry-run] Installing CLI: $name"
     return 0
+  fi
+
+  # Platform skip
+  if [ "$platform_skip" = "darwin" ] || [ "$platform_skip" = "linux" ]; then
+    if { [ "$OS_TYPE" = "Darwin" ] && [ "$platform_skip" = "darwin" ]; } || { [ "$OS_TYPE" = "Linux" ] && [ "$platform_skip" = "linux" ]; }; then
+      echo -e "  [/] $name not available on $OS_TYPE. Skipping."
+      SKIP_LIST+=("$name")
+      return 0
+    fi
   fi
 
   # Skip if already in PATH
@@ -221,74 +262,95 @@ install_cli() {
     return 0
   fi
 
-  # NPM Install
-  if [ "$npm_pkg" != "null" ] && [ -n "$npm_pkg" ]; then
+  # 1) Brew Install
+  if [ "$PKG_MGR" = "brew" ] && [ -n "$brew_pkg" ]; then
+    attempted="$attempted brew"
+    echo "  [+] Installing via Homebrew: $name"
+    if retry_cmd brew install "$brew_pkg"; then
+      if check_command "$binary"; then SUCCESS_LIST+=("$name"); return 0; fi
+    fi
+  fi
+
+  # 2) APT Install
+  if [ "$PKG_MGR" = "apt" ] && [ -n "$apt_pkg" ]; then
+    attempted="$attempted apt"
+    echo "  [+] Installing via APT: $name"
+    if retry_cmd sudo apt-get install -y "$apt_pkg"; then
+      if check_command "$binary"; then SUCCESS_LIST+=("$name"); return 0; fi
+    fi
+  fi
+
+  # 3) NPM Install
+  if [ -n "$npm_pkg" ] && [ "$npm_pkg" != "null" ]; then
+    attempted="$attempted npm"
     echo "  [+] Installing global NPM package: $name"
     if retry_cmd npm install -g "$npm_pkg" --silent; then
-      SUCCESS_LIST+=("$name")
-      return 0
+      SUCCESS_LIST+=("$name"); return 0
     else
       echo -e "${YELLOW}  [!] NPM global failed. Attempting with --unsafe-perm...${NC}"
       if retry_cmd npm install -g "$npm_pkg" --unsafe-perm --silent; then
-        SUCCESS_LIST+=("$name")
-        return 0
+        SUCCESS_LIST+=("$name"); return 0
       fi
     fi
   fi
 
-  # Brew Install
-  if [ "$PKG_MGR" = "brew" ] && [ "$brew_pkg" != "null" ] && [ -n "$brew_pkg" ]; then
-    echo "  [+] Installing via Homebrew: $name"
-    if retry_cmd brew install "$brew_pkg"; then
-      SUCCESS_LIST+=("$name")
-      return 0
-    fi
-  fi
-
-  # APT Install
-  if [ "$PKG_MGR" = "apt" ] && [ "$apt_pkg" != "null" ] && [ -n "$apt_pkg" ]; then
-    echo "  [+] Installing via APT: $name"
-    if retry_cmd sudo apt-get install -y "$apt_pkg"; then
-      SUCCESS_LIST+=("$name")
-      return 0
-    fi
-  fi
-
-  # Pip Install
-  if [ "$pip_pkg" != "null" ] && [ -n "$pip_pkg" ] && check_command pip3; then
+  # 4) Pip Install
+  if [ -n "$pip_pkg" ] && [ "$pip_pkg" != "null" ] && [ "$HAS_PIP" = true ]; then
+    attempted="$attempted pip"
     echo "  [+] Installing via pip3: $name"
     if retry_cmd pip3 install --user "$pip_pkg"; then
-      SUCCESS_LIST+=("$name")
-      return 0
+      if check_command "$binary"; then SUCCESS_LIST+=("$name"); return 0; fi
     fi
   fi
 
-  # Fallback: custom script or curl binary downloads for gitleaks/trufflehog if possible
-  if [ "$name" = "gitleaks" ]; then
-    echo "  [+] Attempting custom binary fetch for gitleaks..."
-    # Custom fallback logic
-    local arch; arch=$(uname -m)
-    local release_url=""
-    if [ "$OS_TYPE" = "Darwin" ]; then
-      release_url="https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks_darwin_x64.tar.gz"
-    else
-      release_url="https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks_linux_x64.tar.gz"
+  # 5) go install
+  if [ -n "$go_pkg" ] && [ "$HAS_GO" = true ]; then
+    attempted="$attempted go"
+    echo "  [+] Installing via go install: $name"
+    go install "$go_pkg" 2>/dev/null || true
+    if [ -f "$HOME/go/bin/$binary" ]; then
+      mkdir -p "$HOME/.local/bin"
+      mv "$HOME/go/bin/$binary" "$HOME/.local/bin/" 2>/dev/null || true
+      if check_command "$binary"; then SUCCESS_LIST+=("$name"); return 0; fi
     fi
-    mkdir -p "$TEMP_DIR/gitleaks_dl"
-    if curl -sSL -o "$TEMP_DIR/gitleaks.tar.gz" "$release_url"; then
-      tar -xzf "$TEMP_DIR/gitleaks.tar.gz" -C "$TEMP_DIR/gitleaks_dl" || true
-      if [ -f "$TEMP_DIR/gitleaks_dl/gitleaks" ]; then
-        sudo mv "$TEMP_DIR/gitleaks_dl/gitleaks" "/usr/local/bin/" || mv "$TEMP_DIR/gitleaks_dl/gitleaks" "$HOME/.local/bin/" || true
-        if check_command gitleaks; then
-          SUCCESS_LIST+=("gitleaks")
-          return 0
-        fi
+  fi
+
+  # 6) cargo install
+  if [ -n "$cargo_pkg" ] && [ "$HAS_CARGO" = true ]; then
+    attempted="$attempted cargo"
+    echo "  [+] Installing via cargo: $name"
+    cargo install "$cargo_pkg" 2>/dev/null || true
+    if check_command "$binary"; then SUCCESS_LIST+=("$name"); return 0; fi
+  fi
+
+  # 7) Direct download fallback (zip/tar.gz)
+  local dl_url=""
+  if [ "$OS_TYPE" = "Darwin" ] && [ -n "$url_darwin" ]; then
+    dl_url="$url_darwin"
+  elif [ "$OS_TYPE" = "Linux" ] && [ -n "$url_linux" ]; then
+    dl_url="$url_linux"
+  fi
+  if [ -n "$dl_url" ] && [ "$HAS_CURL" = true ]; then
+    attempted="$attempted direct-dl"
+    echo "  [+] Attempting direct download for $name..."
+    mkdir -p "$TEMP_DIR/${name}_dl"
+    if curl -sSL -o "$TEMP_DIR/${name}.archive" "$dl_url"; then
+      local extracted_bin
+      extracted_bin=$(find "$TEMP_DIR/${name}_dl" -name "$binary" -type f 2>/dev/null | head -n 1)
+      if [ -z "$extracted_bin" ]; then
+        tar -xzf "$TEMP_DIR/${name}.archive" -C "$TEMP_DIR/${name}_dl" 2>/dev/null || true
+        extracted_bin=$(find "$TEMP_DIR/${name}_dl" -name "$binary" -type f 2>/dev/null | head -n 1)
+      fi
+      if [ -n "$extracted_bin" ]; then
+        mkdir -p "$HOME/.local/bin"
+        cp "$extracted_bin" "$HOME/.local/bin/$binary" 2>/dev/null || sudo cp "$extracted_bin" "/usr/local/bin/$binary" 2>/dev/null || true
+        if check_command "$binary"; then SUCCESS_LIST+=("$name"); return 0; fi
       fi
     fi
   fi
 
   echo -e "${RED}  [-] Failed to install: $name${NC}"
-  FAIL_LIST+=("$name")
+  FAIL_LIST+=("$name|$attempted")
   return 1
 }
 
@@ -304,6 +366,11 @@ if [ "$JQ_AVAILABLE" = true ]; then
     APT_PKG=$(jq -r ".cli_binaries[$i].apt // empty" "$MANIFEST_FILE")
     NPM_PKG=$(jq -r ".cli_binaries[$i].npm // empty" "$MANIFEST_FILE")
     PIP_PKG=$(jq -r ".cli_binaries[$i].pip // empty" "$MANIFEST_FILE")
+    GO_PKG=$(jq -r ".cli_binaries[$i].go_install // empty" "$MANIFEST_FILE")
+    CARGO_PKG=$(jq -r ".cli_binaries[$i].cargo_install // empty" "$MANIFEST_FILE")
+    URL_DARWIN=$(jq -r ".cli_binaries[$i].zip_url_darwin // empty" "$MANIFEST_FILE")
+    URL_LINUX=$(jq -r ".cli_binaries[$i].zip_url_linux // empty" "$MANIFEST_FILE")
+    PLATFORM_SKIP=$(jq -r ".cli_binaries[$i].platform_skip // empty" "$MANIFEST_FILE")
 
     if [ "$ESSENTIAL" = true ] && [ "$ESS" != "true" ]; then
       SKIP_LIST+=("$NAME")
@@ -317,7 +384,7 @@ if [ "$JQ_AVAILABLE" = true ]; then
       fi
     fi
 
-    install_cli "$NAME" "$BINARY" "$BREW_PKG" "$APT_PKG" "$NPM_PKG" "$PIP_PKG"
+    install_cli "$NAME" "$BINARY" "$BREW_PKG" "$APT_PKG" "$NPM_PKG" "$PIP_PKG" "$GO_PKG" "$CARGO_PKG" "$URL_DARWIN" "$URL_LINUX" "$PLATFORM_SKIP"
   done
 else
   # Minimal fallback parsing if jq is absent
@@ -445,8 +512,49 @@ echo ""
 
 if [ ${#FAIL_LIST[@]} -gt 0 ]; then
   echo -e "${RED}${BOLD}Failed Components (Requires Manual Review):${NC}"
-  for fail in "${FAIL_LIST[@]}"; do
-    echo -e "  - $fail"
+  for fail_entry in "${FAIL_LIST[@]}"; do
+    fail_name="${fail_entry%%|*}"
+    echo -e "  - $fail_name"
+  done
+  echo ""
+
+  echo -e "${YELLOW}${BOLD}[*] HOW TO FIX FAILED COMPONENTS:${NC}"
+  for fail_entry in "${FAIL_LIST[@]}"; do
+    fail_name="${fail_entry%%|*}"
+    case "$fail_name" in
+      "ripgrep")
+        echo -e "  rg (ripgrep):"
+        echo -e "    ${CYAN}brew install ripgrep${NC} (macOS) / ${CYAN}sudo apt install ripgrep${NC} (Linux)"
+        echo -e "    ${CYAN}Download: https://github.com/BurntSushi/ripgrep/releases${NC}"
+        ;;
+      "gitleaks")
+        echo -e "  gitleaks:"
+        echo -e "    ${CYAN}brew install gitleaks${NC} (macOS) / ${CYAN}go install github.com/gitleaks/gitleaks/v8@latest${NC} (any)"
+        echo -e "    ${CYAN}Download: https://github.com/gitleaks/gitleaks/releases${NC}"
+        ;;
+      "trufflehog")
+        echo -e "  trufflehog:"
+        echo -e "    ${CYAN}brew install trufflehog${NC} (macOS) / ${CYAN}pip3 install trufflehog${NC} (any)"
+        echo -e "    ${CYAN}go install github.com/trufflesecurity/trufflehog/v3@latest${NC}"
+        ;;
+      "tmux")
+        echo -e "  tmux:"
+        echo -e "    ${CYAN}brew install tmux${NC} (macOS) / ${CYAN}sudo apt install tmux${NC} (Linux)"
+        ;;
+      "localsend")
+        echo -e "  localsend:"
+        echo -e "    ${CYAN}brew install localsend${NC} (macOS) / snap or direct download"
+        echo -e "    ${CYAN}Download: https://github.com/localsend/localsend/releases${NC}"
+        ;;
+      "sniffnet")
+        echo -e "  sniffnet:"
+        echo -e "    ${CYAN}brew install sniffnet${NC} (macOS) / ${CYAN}cargo install sniffnet${NC} (any)"
+        echo -e "    ${CYAN}Download: https://github.com/GyulyVGC/sniffnet/releases${NC}"
+        ;;
+      *)
+        echo -e "  $fail_name: Check https://github.com/AkashPriyadarshii/awesome-agentic-stack for manual instructions"
+        ;;
+    esac
   done
   echo ""
 fi

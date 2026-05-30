@@ -7,6 +7,7 @@
       "brew": "ripgrep",
       "apt": "ripgrep",
       "winget": "BurntSushi.ripgrep",
+      "alternative_url": "https://github.com/BurntSushi/ripgrep/releases",
       "description": "Ultra-fast text search in files"
     },
     {
@@ -15,7 +16,11 @@
       "essential": true,
       "brew": "gitleaks",
       "apt": "curl",
-      "winget": "Git.GitLeaks",
+      "winget": "",
+      "go_install": "github.com/gitleaks/gitleaks/v8@latest",
+      "zip_url_windows": "https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks_windows_x64.zip",
+      "zip_url_darwin": "https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks_darwin_x64.tar.gz",
+      "zip_url_linux": "https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks_linux_x64.tar.gz",
       "description": "Scans directory for credentials/secrets before push"
     },
     {
@@ -24,7 +29,10 @@
       "essential": false,
       "brew": "trufflehog",
       "apt": "curl",
-      "winget": "trufflesecurity.trufflehog",
+      "winget": "",
+      "pip": "trufflehog",
+      "go_install": "github.com/trufflesecurity/trufflehog/v3@latest",
+      "alternative_url": "https://github.com/trufflesecurity/trufflehog/releases",
       "description": "Scans entire git history for leaked credentials"
     },
     {
@@ -33,7 +41,9 @@
       "essential": true,
       "brew": "tmux",
       "apt": "tmux",
-      "winget": "skip",
+      "winget": "",
+      "platform_skip": ["win32"],
+      "alternative_url": "https://github.com/tmux/tmux/wiki",
       "description": "Terminal multiplexer for parallel agent splits"
     },
     {
@@ -73,6 +83,7 @@
       "brew": "localsend",
       "apt": "snap",
       "winget": "Localsend.Localsend",
+      "check_winget_list": true,
       "description": "FOSS AirDrop alternative for quick asset transfers"
     },
     {
@@ -88,7 +99,9 @@
       "essential": false,
       "brew": "sniffnet",
       "apt": "cargo",
-      "winget": "GyulyVGC.Sniffnet",
+      "winget": "",
+      "cargo_install": "sniffnet",
+      "alternative_url": "https://github.com/GyulyVGC/sniffnet/releases",
       "description": "Real-time network telemetry for debugging agent APIs"
     },
     {

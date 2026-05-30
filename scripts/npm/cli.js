@@ -8,7 +8,7 @@ const fs = require('fs');
 // Fetch clean CLI arguments
 const args = process.argv.slice(2);
 
-console.log('⚡ awesome-agentic-stack — Bootstrapping Universal Installer... ⚡\n');
+console.log('[*] awesome-agentic-stack — Bootstrapping Universal Installer...\n');
 
 // Detect Platform
 const platform = os.platform();

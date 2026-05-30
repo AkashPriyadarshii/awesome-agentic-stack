@@ -38,7 +38,7 @@ $SkillPaths = @(
 )
 
 $SuccessList = @()
-$FailList = @()
+$FailList = @()  # Array of hashtables: @{name="x"; attempted=@("winget","npm")}
 $SkipList = @()
 
 # ------------------------------------------------------------------------------
@@ -128,11 +128,13 @@ if ($WingetAvailable) {
 
 # Verify Core Deps
 $Deps = @("git", "node", "npm")
+$MissingDeps = @()
 foreach ($dep in $Deps) {
     if (Check-Command -cmd $dep) {
         Write-Color ("  [+] Dependency " + $dep + ": Installed") "Green"
     } else {
         Write-Color ("  [-] Dependency " + $dep + ": Missing") "Red"
+        $MissingDeps += $dep
         if ($WingetAvailable) {
             Write-Color ("  [+] Auto-installing " + $dep + " via winget...") "Yellow"
             if ($dep -eq "git") {
@@ -143,6 +145,40 @@ foreach ($dep in $Deps) {
         }
     }
 }
+
+# Also check additional tooling availability
+$HasPip = Check-Command -cmd "pip"
+$HasGo = Check-Command -cmd "go"
+$HasCargo = Check-Command -cmd "cargo"
+$HasCurl = Check-Command -cmd "curl"
+
+# Bootstrap: if core deps are missing, show advice before continuing
+if ($MissingDeps.Count -gt 0) {
+    Write-Host ""
+    Write-Color "[!] SYSTEM READINESS REPORT:" "Yellow"
+    Write-Color "  The following core dependencies are missing:" "Yellow"
+    foreach ($m in $MissingDeps) {
+        switch ($m) {
+            "git" { Write-Color "    git  → https://git-scm.com/download/win" "Cyan" }
+            "node" { Write-Color "    node → https://nodejs.org (includes npm)" "Cyan" }
+            "npm" { Write-Color "    npm  → bundled with Node.js above" "Cyan" }
+        }
+    }
+    Write-Color "  Install missing deps, close this shell, open a new one, and re-run." "Yellow"
+    Write-Color "  The installer will continue but some components will likely fail." "Yellow"
+    Write-Host ""
+}
+
+# Check what install methods we have available
+$AvailableMethods = @()
+if ($WingetAvailable) { $AvailableMethods += "winget" }
+if ($HasPip) { $AvailableMethods += "pip" }
+if ($HasGo) { $AvailableMethods += "go" }
+if ($HasCargo) { $AvailableMethods += "cargo" }
+if ($HasCurl) { $AvailableMethods += "curl" }
+$AvailableMethods += "npm"
+$AvailableMethods += "git"
+Write-Color ("  [+] Available methods: " + ($AvailableMethods -join ", ")) "Gray"
 
 # Setup directories
 Write-Host ""
@@ -172,7 +208,12 @@ function Install-CLI {
         [string]$binary,
         [string]$winget_pkg,
         [string]$npm_pkg,
-        [string]$pip_pkg
+        [string]$pip_pkg,
+        [string]$go_pkg,
+        [string]$cargo_pkg,
+        [string]$zip_windows,
+        [string]$check_winget_list,
+        [string]$platform_skip
     )
 
     if ($DryRun) {
@@ -180,102 +221,143 @@ function Install-CLI {
         return $true
     }
 
-    # Check if already installed
+    # Platform skip check
+    if ($platform_skip -and $platform_skip.Contains("win32")) {
+        Write-Color "  [/] $name is not available on Windows. Skipping." "Yellow"
+        $global:SkipList += $name
+        return $true
+    }
+
+    # Check if already installed via binary in PATH
     if (Check-Command -cmd $binary) {
         Write-Color "  [+] $name is already installed." "Gray"
         $global:SuccessList += $name
         return $true
     }
 
-    # NPM installation
-    if ($npm_pkg -and $npm_pkg -ne "null") {
-        Write-Color "  [+] Installing global NPM package: $name" "Yellow"
-        $npmResult = $false
-        for ($i = 1; $i -le 3; $i++) {
-            npm install -g $npm_pkg --silent
-            if ($?) {
-                $npmResult = $true
-                break
-            }
-            Write-Color "  [!] npm install failed. Retrying... ($i/3)" "Yellow"
-            Start-Sleep -Seconds 2
-        }
-        if ($npmResult) {
+    # Check winget list first (for packages like localsend that may already be installed via other sources)
+    if ($check_winget_list -eq "true" -and $WingetAvailable) {
+        $wingetListCheck = winget list --name $name --accept-source-agreements 2>$null
+        if ($LASTEXITCODE -eq 0 -and $wingetListCheck -match $name) {
+            Write-Color "  [+] $name already installed (winget list confirms)." "Gray"
             $global:SuccessList += $name
             return $true
         }
     }
 
-    # Winget installation
-    if ($WingetAvailable -and $winget_pkg -and $winget_pkg -ne "null" -and $winget_pkg -ne "skip") {
+    $attempted = @()
+
+    # 1) Try winget
+    if ($WingetAvailable -and $winget_pkg -and $winget_pkg -ne "") {
+        $attempted += "winget"
         Write-Color "  [+] Installing via winget: $name" "Yellow"
-        $wingetResult = $false
         for ($i = 1; $i -le 3; $i++) {
-            winget install --id $winget_pkg --silent --accept-source-agreements --accept-package-agreements
+            winget install --id $winget_pkg --silent --accept-source-agreements --accept-package-agreements 2>$null
             if ($?) {
-                $wingetResult = $true
-                break
+                Start-Sleep -Seconds 1
+                if (Check-Command -cmd $binary) {
+                    $global:SuccessList += $name; return $true
+                }
             }
             Write-Color "  [!] winget install failed. Retrying... ($i/3)" "Yellow"
             Start-Sleep -Seconds 2
         }
-        if ($wingetResult) {
-            $global:SuccessList += $name
-            return $true
+    }
+
+    # 2) Try npm
+    if ($npm_pkg -and $npm_pkg -ne "" -and $npm_pkg -ne "null") {
+        $attempted += "npm"
+        Write-Color "  [+] Installing via npm: $name" "Yellow"
+        for ($i = 1; $i -le 3; $i++) {
+            npm install -g $npm_pkg --silent 2>$null
+            if ($?) {
+                if (Check-Command -cmd $binary) {
+                    $global:SuccessList += $name; return $true
+                }
+            }
+            Write-Color "  [!] npm install failed. Retrying... ($i/3)" "Yellow"
+            Start-Sleep -Seconds 2
         }
     }
 
-    # Pip installation
-    if ($pip_pkg -and $pip_pkg -ne "null" -and (Check-Command -cmd "pip")) {
+    # 3) Try pip
+    if ($pip_pkg -and $pip_pkg -ne "" -and $pip_pkg -ne "null" -and $HasPip) {
+        $attempted += "pip"
         Write-Color "  [+] Installing via pip: $name" "Yellow"
-        $pipResult = $false
         for ($i = 1; $i -le 3; $i++) {
-            pip install --user $pip_pkg
+            pip install --user $pip_pkg 2>$null
             if ($?) {
-                $pipResult = $true
-                break
+                if (Check-Command -cmd $binary) {
+                    $global:SuccessList += $name; return $true
+                }
             }
             Write-Color "  [!] pip install failed. Retrying... ($i/3)" "Yellow"
             Start-Sleep -Seconds 2
         }
-        if ($pipResult) {
-            $global:SuccessList += $name
-            return $true
-        }
     }
 
-    # Fallback Custom installer for Windows (gitleaks)
-    if ($name -eq "gitleaks") {
-        Write-Color "  [+] Attempting custom zip fetch for Gitleaks..." "Yellow"
-        $dl_url = "https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks_windows_x64.zip"
-        $zip_dest = $TempDir + "\gitleaks.zip"
-        $extract_dest = $TempDir + "\gitleaks_extracted"
-        
-        $dlResult = $false
+    # 4) Try go install
+    if ($go_pkg -and $go_pkg -ne "" -and $HasGo) {
+        $attempted += "go"
+        Write-Color "  [+] Installing via go install: $name" "Yellow"
+        go install $go_pkg 2>$null
+        if ($?) {
+            $goBin = "$env:USERPROFILE\go\bin\$binary.exe"
+            if (Test-Path $goBin) {
+                $localBin = "$env:USERPROFILE\.local\bin"
+                if (-not (Test-Path $localBin)) { New-Item -ItemType Directory -Path $localBin -Force | Out-Null }
+                Copy-Item -Path $goBin -Destination "$localBin\$binary.exe" -Force
+                if (Check-Command -cmd $binary) {
+                    $global:SuccessList += $name; return $true
+                }
+            }
+        }
+        Write-Color "  [!] go install failed." "Yellow"
+    }
+
+    # 5) Try cargo install
+    if ($cargo_pkg -and $cargo_pkg -ne "" -and $HasCargo) {
+        $attempted += "cargo"
+        Write-Color "  [+] Installing via cargo: $name" "Yellow"
+        cargo install $cargo_pkg 2>$null
+        if ($?) {
+            if (Check-Command -cmd $binary) {
+                $global:SuccessList += $name; return $true
+            }
+        }
+        Write-Color "  [!] cargo install failed." "Yellow"
+    }
+
+    # 6) Try direct zip download (Windows fallback)
+    if ($zip_windows -and $zip_windows -ne "" -and $HasCurl) {
+        $attempted += "zip"
+        Write-Color "  [+] Attempting direct download for $name..." "Yellow"
+        $zip_dest = "$TempDir\$name.zip"
+        $extract_dest = "$TempDir\$name" + "_extracted"
         for ($i = 1; $i -le 3; $i++) {
-            Invoke-WebRequest -Uri $dl_url -OutFile $zip_dest -TimeoutSec 10
-            if ($?) {
-                $dlResult = $true
-                break
-            }
+            Invoke-WebRequest -Uri $zip_windows -OutFile $zip_dest -TimeoutSec 15 2>$null
+            if ($?) { break }
             Write-Color "  [!] Download failed. Retrying... ($i/3)" "Yellow"
-            Start-Sleep -Seconds 2
+            Start-Sleep -Seconds 3
         }
-
-        if ($dlResult) {
-            Expand-Archive -Path $zip_dest -DestinationPath $extract_dest -Force
-            if (Test-Path ($extract_dest + "\gitleaks.exe")) {
-                $local_bin = $env:USERPROFILE + "\.local\bin"
-                if (-not (Test-Path $local_bin)) { New-Item -ItemType Directory -Path $local_bin -Force | Out-Null }
-                Copy-Item -Path ($extract_dest + "\gitleaks.exe") -Destination ($local_bin + "\gitleaks.exe") -Force
-                $global:SuccessList += "gitleaks"
-                return $true
+        if (Test-Path $zip_dest) {
+            Expand-Archive -Path $zip_dest -DestinationPath $extract_dest -Force 2>$null
+            $exe = Get-ChildItem -Path $extract_dest -Recurse -Filter "$binary.exe" | Select-Object -First 1
+            if (-not $exe) { $exe = Get-ChildItem -Path $extract_dest -Recurse -Filter "*.exe" | Select-Object -First 1 }
+            if ($exe) {
+                $localBin = "$env:USERPROFILE\.local\bin"
+                if (-not (Test-Path $localBin)) { New-Item -ItemType Directory -Path $localBin -Force | Out-Null }
+                Copy-Item -Path $exe.FullName -Destination "$localBin\$binary.exe" -Force
+                if (Check-Command -cmd $binary) {
+                    $global:SuccessList += $name; return $true
+                }
             }
         }
     }
 
+    # All methods exhausted - record failure with advice
     Write-Color "  [-] Failed to install: $name" "Red"
-    $global:FailList += $name
+    $global:FailList += @{name=$name; attempted=$attempted}
     return $false
 }
 
@@ -293,7 +375,7 @@ foreach ($cli in $Manifest.cli_binaries) {
         }
     }
 
-    Install-CLI -name $cli.name -binary $cli.binary -winget_pkg $cli.winget -npm_pkg $cli.npm -pip_pkg $cli.pip
+    Install-CLI -name $cli.name -binary $cli.binary -winget_pkg $cli.winget -npm_pkg $cli.npm -pip_pkg $cli.pip -go_pkg $cli.go_install -cargo_pkg $cli.cargo_install -zip_windows $cli.zip_url_windows -check_winget_list $cli.check_winget_list -platform_skip $cli.platform_skip
 }
 
 # ------------------------------------------------------------------------------
@@ -430,8 +512,51 @@ Write-Host ""
 
 if ($FailList.Count -gt 0) {
     Write-Color "Failed Components (Requires Manual Review):" "Red"
-    foreach ($fail in $FailList) {
-        Write-Color ("  - " + $fail) "Red"
+    foreach ($failObj in $FailList) {
+        $failName = if ($failObj -is [hashtable]) { $failObj.name } else { $failObj }
+        Write-Color ("  - " + $failName) "Red"
+    }
+    Write-Host ""
+
+    Write-Color "[*] HOW TO FIX FAILED COMPONENTS:" "Yellow"
+    foreach ($failObj in $FailList) {
+        $failName = if ($failObj -is [hashtable]) { $failObj.name } else { $failObj }
+        switch ($failName) {
+            "ripgrep" {
+                Write-Color "  rg (ripgrep):" "White"
+                Write-Color "    Option A: Download from https://github.com/BurntSushi/ripgrep/releases" "Cyan"
+                Write-Color "    Option B: scoop install ripgrep" "Cyan"
+                Write-Color "    Option C: winget install ripgrep (try after winget source update)" "Cyan"
+            }
+            "gitleaks" {
+                Write-Color "  gitleaks:" "White"
+                Write-Color "    Option A: go install github.com/gitleaks/gitleaks/v8@latest" "Cyan"
+                Write-Color "    Option B: Download from https://github.com/gitleaks/gitleaks/releases" "Cyan"
+                Write-Color "    Option C: scoop install gitleaks" "Cyan"
+            }
+            "trufflehog" {
+                Write-Color "  trufflehog:" "White"
+                Write-Color "    Option A: pip install trufflehog" "Cyan"
+                Write-Color "    Option B: go install github.com/trufflesecurity/trufflehog/v3@latest" "Cyan"
+            }
+            "tmux" {
+                Write-Color "  tmux:" "White"
+                Write-Color "    Native Windows: Not available. Use WSL:" "Cyan"
+                Write-Color "    wsl sudo apt install tmux" "Cyan"
+            }
+            "localsend" {
+                Write-Color "  localsend:" "White"
+                Write-Color "    Already installed or download from https://github.com/localsend/localsend/releases" "Cyan"
+            }
+            "sniffnet" {
+                Write-Color "  sniffnet:" "White"
+                Write-Color "    Option A: cargo install sniffnet" "Cyan"
+                Write-Color "    Option B: Download from https://github.com/GyulyVGC/sniffnet/releases" "Cyan"
+            }
+            default {
+                Write-Color "  $failName: Check https://github.com/AkashPriyadarshii/awesome-agentic-stack for manual install instructions" "Cyan"
+            }
+        }
     }
     Write-Host ""
 }

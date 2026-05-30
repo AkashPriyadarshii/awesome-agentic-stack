@@ -30,10 +30,19 @@ The only agentic coding stack built for ₹0 budget and 50× output.
 Install all CLI tools, clone all agent skills, and deploy configuration templates in one command.
 
 ### <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/bot.svg" width="18" height="18" style="vertical-align: middle; margin-right: 8px;" /> For LLM Agents (Claude Code, OpenCode, Antigravity, etc.)
-Just paste this into your active coding agent:
-```text
-Read the install.sh (macOS/Linux) or install.ps1 (Windows) files from the https://github.com/AkashPriyadarshii/awesome-agentic-stack repository and install all curation components for my system.
+Paste the command for your OS directly:
+
+**macOS/Linux:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/AkashPriyadarshii/awesome-agentic-stack/main/install.sh | bash -s -- --essential
 ```
+
+**Windows:**
+```powershell
+irm https://raw.githubusercontent.com/AkashPriyadarshii/awesome-agentic-stack/main/install.ps1 | iex
+```
+
+If install fails, try `--dry-run` first to preview, then retry. All 96 tools are documented at https://github.com/AkashPriyadarshii/awesome-agentic-stack.
 
 ### <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/terminal.svg" width="18" height="18" style="vertical-align: middle; margin-right: 8px;" /> For Terminals (Human Devs)
 
