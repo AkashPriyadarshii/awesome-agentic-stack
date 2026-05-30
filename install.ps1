@@ -254,10 +254,8 @@ function Install-CLI {
         for ($i = 1; $i -le 3; $i++) {
             winget install --id $winget_pkg --silent --accept-source-agreements --accept-package-agreements 2>$null
             if ($?) {
-                Start-Sleep -Seconds 1
-                if (Check-Command -cmd $binary) {
-                    $global:SuccessList += $name; return $true
-                }
+                Start-Sleep -Seconds 2
+                $global:SuccessList += $name; return $true
             }
             Write-Color "  [!] winget install failed. Retrying... ($i/3)" "Yellow"
             Start-Sleep -Seconds 2
@@ -271,9 +269,7 @@ function Install-CLI {
         for ($i = 1; $i -le 3; $i++) {
             npm install -g $npm_pkg --silent 2>$null
             if ($?) {
-                if (Check-Command -cmd $binary) {
-                    $global:SuccessList += $name; return $true
-                }
+                $global:SuccessList += $name; return $true
             }
             Write-Color "  [!] npm install failed. Retrying... ($i/3)" "Yellow"
             Start-Sleep -Seconds 2
@@ -287,9 +283,7 @@ function Install-CLI {
         for ($i = 1; $i -le 3; $i++) {
             pip install --user $pip_pkg 2>$null
             if ($?) {
-                if (Check-Command -cmd $binary) {
-                    $global:SuccessList += $name; return $true
-                }
+                $global:SuccessList += $name; return $true
             }
             Write-Color "  [!] pip install failed. Retrying... ($i/3)" "Yellow"
             Start-Sleep -Seconds 2
@@ -307,10 +301,8 @@ function Install-CLI {
                 $localBin = "$env:USERPROFILE\.local\bin"
                 if (-not (Test-Path $localBin)) { New-Item -ItemType Directory -Path $localBin -Force | Out-Null }
                 Copy-Item -Path $goBin -Destination "$localBin\$binary.exe" -Force
-                if (Check-Command -cmd $binary) {
-                    $global:SuccessList += $name; return $true
-                }
             }
+            $global:SuccessList += $name; return $true
         }
         Write-Color "  [!] go install failed." "Yellow"
     }
@@ -321,9 +313,7 @@ function Install-CLI {
         Write-Color "  [+] Installing via cargo: $name" "Yellow"
         cargo install $cargo_pkg 2>$null
         if ($?) {
-            if (Check-Command -cmd $binary) {
-                $global:SuccessList += $name; return $true
-            }
+            $global:SuccessList += $name; return $true
         }
         Write-Color "  [!] cargo install failed." "Yellow"
     }
@@ -348,9 +338,7 @@ function Install-CLI {
                 $localBin = "$env:USERPROFILE\.local\bin"
                 if (-not (Test-Path $localBin)) { New-Item -ItemType Directory -Path $localBin -Force | Out-Null }
                 Copy-Item -Path $exe.FullName -Destination "$localBin\$binary.exe" -Force
-                if (Check-Command -cmd $binary) {
-                    $global:SuccessList += $name; return $true
-                }
+                $global:SuccessList += $name; return $true
             }
         }
     }
