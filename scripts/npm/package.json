@@ -1,7 +1,7 @@
 {
   "name": "awesome-agentic-stack",
-  "version": "1.0.0",
-  "description": "Cross-platform installer for the curated ₹0 awesome-agentic-stack developer workspace.",
+  "version": "1.1.0",
+  "description": "Smart installer - idempotent, stateful, parallel, self-healing",
   "main": "cli.js",
   "bin": {
     "awesome-agentic-stack": "cli.js"
