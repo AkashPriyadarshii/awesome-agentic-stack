@@ -554,7 +554,7 @@ if ($FailList.Count -gt 0) {
                 Write-Color "    Option B: Download from https://github.com/GyulyVGC/sniffnet/releases" "Cyan"
             }
             default {
-                Write-Color "  $failName: Check https://github.com/AkashPriyadarshii/awesome-agentic-stack for manual install instructions" "Cyan"
+                Write-Color ("  " + $failName + ": Check https://github.com/AkashPriyadarshii/awesome-agentic-stack for manual install instructions") "Cyan"
             }
         }
     }
