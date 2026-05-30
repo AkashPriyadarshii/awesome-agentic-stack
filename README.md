@@ -53,7 +53,7 @@ Choose **one** command for your platform:
 npx awesome-agentic-stack
 ```
 
-**<img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/apple.svg" width="16" height="16" style="vertical-align: middle; margin-right: 4px;" /> macOS / <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/linux.svg" width="16" height="16" style="vertical-align: middle; margin-right: 4px;" /> Linux (Bash):**
+**<img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/apple.svg" width="16" height="16" style="vertical-align: middle; margin-right: 4px;" /> macOS / <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/terminal.svg" width="16" height="16" style="vertical-align: middle; margin-right: 4px;" /> Linux (Bash):**
 ```bash
 curl -fsSL https://raw.githubusercontent.com/AkashPriyadarshii/awesome-agentic-stack/main/install.sh | bash
 ```
