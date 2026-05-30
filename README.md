@@ -1,6 +1,6 @@
 <div align="center">
 
-# ⚡ awesome-agentic-stack
+# <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/zap.svg" width="38" height="38" style="vertical-align: middle; margin-right: 8px;" /> awesome-agentic-stack
 
 **386 repos audited. 96 survived.**
 The only agentic coding stack built for ₹0 budget and 50× output.
@@ -25,36 +25,36 @@ The only agentic coding stack built for ₹0 budget and 50× output.
 
 ---
 
-## ⚡ Unified Installation
+## <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/zap.svg" width="22" height="22" style="vertical-align: middle; margin-right: 8px;" /> Unified Installation
 
 Install all CLI tools, clone all agent skills, and deploy configuration templates in one command.
 
-### 🤖 For LLM Agents (Claude Code, OpenCode, Antigravity, etc.)
+### <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/bot.svg" width="18" height="18" style="vertical-align: middle; margin-right: 8px;" /> For LLM Agents (Claude Code, OpenCode, Antigravity, etc.)
 Just paste this into your active coding agent:
 ```text
-Read the install.sh (macOS/Linux) or install.ps1 (Windows) files in this repository and install all curation components for my system.
+Read the install.sh (macOS/Linux) or install.ps1 (Windows) files from the https://github.com/AkashPriyadarshii/awesome-agentic-stack repository and install all curation components for my system.
 ```
 
-### 💻 For Terminals (Human Devs)
+### <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/terminal.svg" width="18" height="18" style="vertical-align: middle; margin-right: 8px;" /> For Terminals (Human Devs)
 
 Choose **one** command for your platform:
 
-**🎯 Universal (Requires Node.js):**
+**<img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/compass.svg" width="16" height="16" style="vertical-align: middle; margin-right: 4px;" /> Universal (Requires Node.js):**
 ```bash
 npx awesome-agentic-stack
 ```
 
-**🍏 macOS / 🐧 Linux (Bash):**
+**<img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/apple.svg" width="16" height="16" style="vertical-align: middle; margin-right: 4px;" /> macOS / <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/linux.svg" width="16" height="16" style="vertical-align: middle; margin-right: 4px;" /> Linux (Bash):**
 ```bash
 curl -fsSL https://raw.githubusercontent.com/AkashPriyadarshii/awesome-agentic-stack/main/install.sh | bash
 ```
 
-**🪟 Windows 11 (PowerShell):**
+**<img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/monitor.svg" width="16" height="16" style="vertical-align: middle; margin-right: 4px;" /> Windows 11 (PowerShell):**
 ```powershell
 irm https://raw.githubusercontent.com/AkashPriyadarshii/awesome-agentic-stack/main/install.ps1 | iex
 ```
 
-### ⚙️ Command Flags
+### <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/settings.svg" width="18" height="18" style="vertical-align: middle; margin-right: 8px;" /> Command Flags
 Customize your compilation:
 - `--essential` / `-e` : Install core elements only (~30 items)
 - `--interactive` / `-i` : Confirm each component before installing
@@ -64,7 +64,7 @@ Customize your compilation:
 
 ---
 
-## 🔄 The Dev Loop
+## <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/refresh-cw.svg" width="22" height="22" style="vertical-align: middle; margin-right: 8px;" /> The Dev Loop
 
 The 4-phase loop optimized for maximum token efficiency and ₹0 cost coding:
 
@@ -94,7 +94,7 @@ SESSION END (Phase 4)
 
 ---
 
-## 🏆 PHASE 0 — IDENTITY LAYER
+## <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/trophy.svg" width="22" height="22" style="vertical-align: middle; margin-right: 8px;" /> PHASE 0 — IDENTITY LAYER
 
 Drop these rules, harness files, and behavior configurations in every project once.
 
@@ -154,7 +154,7 @@ Drop these rules, harness files, and behavior configurations in every project on
 
 ---
 
-## 💾 PHASE 1 — SESSION START
+## <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/play.svg" width="22" height="22" style="vertical-align: middle; margin-right: 8px;" /> PHASE 1 — SESSION START
 
 Run these at the start of every session to minimize token burn and maximize context clarity.
 
@@ -178,7 +178,7 @@ Run these at the start of every session to minimize token burn and maximize cont
 
 ---
 
-## 🖥️ PHASE 2 — ACTIVE CODING
+## <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/code.svg" width="22" height="22" style="vertical-align: middle; margin-right: 8px;" /> PHASE 2 — ACTIVE CODING
 
 Orchestrate agents, use multi-agent setups, and manage local workspaces.
 
@@ -199,7 +199,7 @@ Orchestrate agents, use multi-agent setups, and manage local workspaces.
 
 ---
 
-## 📱 PHASE 3 — MOBILE & CROSS-DEVICE
+## <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/smartphone.svg" width="22" height="22" style="vertical-align: middle; margin-right: 8px;" /> PHASE 3 — MOBILE & CROSS-DEVICE
 
 GT7-specific, Android automation, and continuous device sync.
 
@@ -221,7 +221,7 @@ GT7-specific, Android automation, and continuous device sync.
 
 ---
 
-## 🛡️ PHASE 4 — SESSION END
+## <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/shield.svg" width="22" height="22" style="vertical-align: middle; margin-right: 8px;" /> PHASE 4 — SESSION END
 
 Run these before every git push to verify code quality, security, and save context.
 
@@ -245,7 +245,7 @@ Run these before every git push to verify code quality, security, and save conte
 
 ---
 
-## 🔧 DEV TOOLS (Always Installed)
+## <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/wrench.svg" width="22" height="22" style="vertical-align: middle; margin-right: 8px;" /> DEV TOOLS (Always Installed)
 
 Essential developer utilities to keep installed in your local system path.
 
@@ -260,7 +260,7 @@ Essential developer utilities to keep installed in your local system path.
 
 ---
 
-## 📚 ALWAYS-OPEN REFERENCE TABS
+## <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/book-open.svg" width="22" height="22" style="vertical-align: middle; margin-right: 8px;" /> ALWAYS-OPEN REFERENCE TABS
 
 Keep these bookmarked in your browser window to source APIs, prompts, and design guidelines.
 
@@ -284,7 +284,7 @@ Keep these bookmarked in your browser window to source APIs, prompts, and design
 
 ---
 
-## 🤖 ANDROID + GT7 DEV
+## <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/smartphone.svg" width="22" height="22" style="vertical-align: middle; margin-right: 8px;" /> ANDROID + GT7 DEV
 
 Niche optimization references for Android reverse engineering and custom system control.
 
@@ -302,7 +302,7 @@ Niche optimization references for Android reverse engineering and custom system 
 
 ---
 
-## 🤝 Contributing & Submissions
+## <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/users.svg" width="22" height="22" style="vertical-align: middle; margin-right: 8px;" /> Contributing & Submissions
 
 Have a tool that survived ₹0 constraints and has been tested under strict environments? 
 
@@ -313,7 +313,7 @@ Please read our [CONTRIBUTING.md](CONTRIBUTING.md) to understand the quality gat
 
 ---
 
-## 📄 License & Maintainer
+## <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/file-text.svg" width="22" height="22" style="vertical-align: middle; margin-right: 8px;" /> License & Maintainer
 
 Curated with ❤️ by **Akash Priyadarshi**. 
 
