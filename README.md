@@ -52,6 +52,7 @@ Choose **one** command for your platform:
 ```bash
 npx awesome-agentic-stack
 ```
+[![npm](https://img.shields.io/npm/v/awesome-agentic-stack)](https://npmjs.com/package/awesome-agentic-stack)
 
 **<img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/apple.svg" width="16" height="16" style="vertical-align: middle; margin-right: 4px;" /> macOS / <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/terminal.svg" width="16" height="16" style="vertical-align: middle; margin-right: 4px;" /> Linux (Bash):**
 ```bash

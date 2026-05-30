@@ -7,33 +7,45 @@
       "brew": "ripgrep",
       "apt": "ripgrep",
       "winget": "BurntSushi.ripgrep",
-      "alternative_url": "https://github.com/BurntSushi/ripgrep/releases",
-      "description": "Ultra-fast text search in files"
+      "description": "Ultra-fast text search in files",
+      "depends_on": [],
+      "fail_advice": [
+        "Download from https://github.com/BurntSushi/ripgrep/releases",
+        "scoop install ripgrep"
+      ]
     },
     {
       "name": "gitleaks",
       "binary": "gitleaks",
       "essential": true,
       "brew": "gitleaks",
-      "apt": "curl",
-      "winget": "",
+      "winget": null,
       "go_install": "github.com/gitleaks/gitleaks/v8@latest",
       "zip_url_windows": "https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks_windows_x64.zip",
       "zip_url_darwin": "https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks_darwin_x64.tar.gz",
       "zip_url_linux": "https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks_linux_x64.tar.gz",
-      "description": "Scans directory for credentials/secrets before push"
+      "description": "Scans directory for credentials/secrets before push",
+      "depends_on": ["go"],
+      "fail_advice": [
+        "go install github.com/gitleaks/gitleaks/v8@latest",
+        "Download from https://github.com/gitleaks/gitleaks/releases"
+      ]
     },
     {
       "name": "trufflehog",
       "binary": "trufflehog",
       "essential": false,
       "brew": "trufflehog",
-      "apt": "curl",
-      "winget": "",
+      "winget": null,
       "pip": "trufflehog",
       "go_install": "github.com/trufflesecurity/trufflehog/v3@latest",
-      "alternative_url": "https://github.com/trufflesecurity/trufflehog/releases",
-      "description": "Scans entire git history for leaked credentials"
+      "description": "Scans entire git history for leaked credentials",
+      "depends_on": [],
+      "fail_advice": [
+        "pip install trufflehog",
+        "go install github.com/trufflesecurity/trufflehog/v3@latest",
+        "Download from https://github.com/trufflesecurity/trufflehog/releases"
+      ]
     },
     {
       "name": "tmux",
@@ -41,31 +53,46 @@
       "essential": true,
       "brew": "tmux",
       "apt": "tmux",
-      "winget": "",
+      "winget": null,
       "platform_skip": ["win32"],
-      "alternative_url": "https://github.com/tmux/tmux/wiki",
-      "description": "Terminal multiplexer for parallel agent splits"
+      "description": "Terminal multiplexer for parallel agent splits",
+      "depends_on": [],
+      "fail_advice": [
+        "brew install tmux (macOS) / sudo apt install tmux (Linux)"
+      ]
     },
     {
       "name": "jscpd",
       "binary": "jscpd",
       "essential": false,
       "npm": "jscpd",
-      "description": "Detects duplicate/slop code in codebase"
+      "description": "Detects duplicate/slop code in codebase",
+      "depends_on": [],
+      "fail_advice": [
+        "npm install -g jscpd"
+      ]
     },
     {
       "name": "repomix",
       "binary": "repomix",
       "essential": true,
       "npm": "repomix",
-      "description": "Packs entire codebase into a single AI-optimized file"
+      "description": "Packs entire codebase into a single AI-optimized file",
+      "depends_on": [],
+      "fail_advice": [
+        "npm install -g repomix"
+      ]
     },
     {
       "name": "openskills",
       "binary": "openskills",
       "essential": true,
       "npm": "openskills",
-      "description": "Universal agent skill installer"
+      "description": "Universal agent skill installer",
+      "depends_on": [],
+      "fail_advice": [
+        "npm install -g openskills"
+      ]
     },
     {
       "name": "syncthing",
@@ -74,42 +101,60 @@
       "brew": "syncthing",
       "apt": "syncthing",
       "winget": "Syncthing.Syncthing",
-      "description": "Continuous P2P cross-device file sync"
+      "description": "Continuous P2P cross-device file sync",
+      "depends_on": [],
+      "fail_advice": [
+        "Download from https://github.com/syncthing/syncthing/releases"
+      ]
     },
     {
       "name": "localsend",
       "binary": "localsend",
       "essential": false,
       "brew": "localsend",
-      "apt": "snap",
       "winget": "Localsend.Localsend",
       "check_winget_list": true,
-      "description": "FOSS AirDrop alternative for quick asset transfers"
+      "description": "FOSS AirDrop alternative for quick asset transfers",
+      "depends_on": [],
+      "fail_advice": [
+        "Download from https://github.com/localsend/localsend/releases"
+      ]
     },
     {
       "name": "vulture",
       "binary": "vulture",
       "essential": false,
       "pip": "vulture",
-      "description": "Static analyzer to detect/delete dead Python code"
+      "description": "Static analyzer to detect/delete dead Python code",
+      "depends_on": [],
+      "fail_advice": [
+        "pip install vulture"
+      ]
     },
     {
       "name": "sniffnet",
       "binary": "sniffnet",
       "essential": false,
       "brew": "sniffnet",
-      "apt": "cargo",
-      "winget": "",
+      "winget": null,
       "cargo_install": "sniffnet",
-      "alternative_url": "https://github.com/GyulyVGC/sniffnet/releases",
-      "description": "Real-time network telemetry for debugging agent APIs"
+      "description": "Real-time network telemetry for debugging agent APIs",
+      "depends_on": [],
+      "fail_advice": [
+        "cargo install sniffnet",
+        "Download from https://github.com/GyulyVGC/sniffnet/releases"
+      ]
     },
     {
       "name": "headroom",
       "binary": "headroom",
       "essential": false,
       "npm": "headroom",
-      "description": "Compress dense raw logs/traces before model ingestion"
+      "description": "Compress dense raw logs/traces before model ingestion",
+      "depends_on": [],
+      "fail_advice": [
+        "npm install -g headroom"
+      ]
     }
   ],
   "skills": [
