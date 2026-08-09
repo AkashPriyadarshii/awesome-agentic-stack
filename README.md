@@ -2,8 +2,8 @@
 
 # <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/zap.svg" width="38" height="38" style="vertical-align: middle; margin-right: 8px;" /> awesome-agentic-stack
 
-**386 repos audited. 96 survived.**
-The only agentic coding stack built for ₹0 budget and 50× output.
+**96 tools. ₹0 enforced. Free-tier floor.**
+A curated agentic coding stack built for ₹0 budget and tight hardware.
 
 [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
 ![Last Updated](https://img.shields.io/github/last-commit/AkashPriyadarshii/awesome-agentic-stack)
@@ -21,7 +21,7 @@ The only agentic coding stack built for ₹0 budget and 50× output.
 
 - **Survival Under Constraint**: Most awesome lists curate by existence. This curates by survival under constraint.
 - **₹0 Enforced**: Every tool here runs on a free tier, with zero payment method or credit card required (exceptions explicitly flagged).
-- **Workflow First**: Organized by *when* you use it in your session—not by category—because workflow beats taxonomy. The 290 repos that didn't pass the audit are in [lists/rejected.md](lists/rejected.md).
+- **Workflow First**: Organized by *when* you use it in your session—not by category—because workflow beats taxonomy. The reasons a tool can be dropped are in [lists/rejected.md](lists/rejected.md).
 
 ---
 
