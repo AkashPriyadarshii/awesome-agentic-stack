@@ -15,6 +15,8 @@ A curated agentic coding stack built for ₹0 budget and tight hardware.
 
 </div>
 
+[![stars](https://img.shields.io/github/stars/AkashPriyadarshii/awesome-agentic-stack?style=flat-square&label=stars)](https://github.com/AkashPriyadarshii/awesome-agentic-stack/stargazers)
+
 ---
 
 ### Why This List Exists
