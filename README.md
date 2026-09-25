@@ -2,6 +2,8 @@
 
 # <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/zap.svg" width="38" height="38" style="vertical-align: middle; margin-right: 8px;" /> awesome-agentic-stack
 
+**Support:** fuel the next build — [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/AkashPriyadarshi)
+
 **96 tools. ₹0 enforced. Free-tier floor.**
 A curated agentic coding stack built for ₹0 budget and tight hardware.
 
@@ -325,20 +327,12 @@ Please read our [CONTRIBUTING.md](CONTRIBUTING.md) to understand the quality gat
 
 ---
 
-
-
 <p align="center">
   <img src="https://api.star-history.com/svg?repos=AkashPriyadarshii/awesome-agentic-stack&type=Date" width="600" alt="star history" />
 </p>
-
 
 ## <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/file-text.svg" width="22" height="22" style="vertical-align: middle; margin-right: 8px;" /> License & Maintainer
 
 Curated with ❤️ by **Akash Priyadarshi**. 
 
 Distributed under the **MIT License**. See [LICENSE](LICENSE) for details.
-
-
----
-
-**Support:** fuel the next build — [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/AkashPriyadarshi)
